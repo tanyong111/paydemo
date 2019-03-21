@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<script>
+    function submit() {
+        var form = document.getElementById('myForm');
+        form.submit();
+        return false;
+    }
+</script>
+<body>
+    <form id="myForm" action="../pay" method="POST" onsubmit="submit()">
+        金额：<input type="text" id="payAmount" name="payAmount">
+        <input type="submit">
+    </form>
+    <br/>
+    <p id="result"></p>
+    <a href="./refund.html">退款</a>
+</body>
+</html>

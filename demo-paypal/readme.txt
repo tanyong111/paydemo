@@ -1,0 +1,15 @@
+﻿本demo示列了两种支付方式，v1和v2rest支付
+v1rest支付对应PayController，v2支付对应CheckoutPayController
+拿到Client ID:和Secret:后替换配置文件的对应属性。
+使用natapp类似的内网穿透工具得到一个映射本地端口8080的网址，访问网址就是v1的支付方式。在网址后面加上/checkout/就是v2支付
+
+v1版本的rest支付流程大致是用户点击下单，服务器得到请求后请求paypal创建订单并得到paypal返回的paymentId和重定向url，
+服务器通知客户端重定向，用户通过客户端登陆付款，付款成功后会调用服务器的成功付款接口，服务器调用paypal接口确定收款，支付完成。
+
+checkout是V2，目前paypal最新版本的支付，本demo中的checkout的intent是capture方式，大致流程是：
+服务器请求创建订单，用户提交支付，支付成功后paypal返回到我们服务器，我们服务器需要capture这个订单，表示确认这笔交易成功。
+如果服务器不调用capture捕获，那么这笔交易不会成功！也就是说，假设你没有收到paypal的结果通知，你也需要主动去capture订单。
+并且成功只能capture一次，再次capture就会抛异常。并且在用户未支付时capture也会报异常，所以我的思路是用户下单后，
+每隔一段时间请求查询一次订单是否已支付，如果是APPROVED状态则调用capture。
+
+请先拿到Client ID:和Secret:再启动本demo

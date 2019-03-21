@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="./js/qrcode.js" ></script>
+</head>
+<script>
+	var interval;
+	var out_trade_no;
+    function getQrcode() {
+		var form = document.getElementById("myForm");
+		var formData = new FormData(form);
+        out_trade_no=formData.get("out_trade_no");
+        var xhr;
+        var url="../pay";
+        if(window.XMLHttpRequest) {
+            xhr=new XMLHttpRequest();
+        } else {
+            xhr=new ActiveXObject('Microsoft.XMLHTTP');
+        }
+        xhr.open("post",url);
+        xhr.onload = () => {
+            if(xhr.status===200) {
+                var data=xhr.response;
+                console.log(data+"----");
+                if(data != undefined && data != '') {
+                    var qrcode = new QRCode(document.getElementById("qrcode"), {
+                    width : 96,//设置宽高
+                    height : 96
+                    });
+                    qrcode.makeCode(data);
+                } else {
+                    alert("订单号重复！");
+                }
+            }
+        }
+        xhr.error = () => {
+            console.log('error----');
+        }
+        xhr.send(formData);
+        interval=self.setInterval("clock()",1000);
+    }
+    function clock()
+	{
+        var formData = new FormData();
+        formData.append("out_trade_no",out_trade_no);
+		var xhr;
+        var url="../orderQuery";
+        if(window.XMLHttpRequest) {
+            xhr=new XMLHttpRequest();
+        } else {
+            xhr=new ActiveXObject('Microsoft.XMLHTTP');
+        }
+        xhr.open("post",url);
+        xhr.onload = () => {
+            if(xhr.status===200) {
+                var data=xhr.response;
+                console.log(data);
+                if(data == "success") {
+                    document.getElementById("result").innerText=data;
+                    window.clearInterval(interval);
+                }
+            }
+        }
+        xhr.error = () => {
+            console.log('error----');
+        }
+        xhr.send(formData);
+	}
+</script>
+<body>
+    <form id="myForm" method="POST">
+        订单号：<input type="text" id="out_trade_no" name="out_trade_no">
+        金额：<input type="text" id="amount" name="amount">
+    </form>
+    <button onclick="getQrcode()">提交订单</button>
+    扫描下方二维码支付：
+    <br/>
+    <div id="qrcode" style="text-align: center;"></div>
+    <p id="result"></p>
+    <a href="./refund.html">退款</a>
+</body>
+</html>
